@@ -20,8 +20,16 @@ Route::get('/', function () {
 Auth::routes();
 
 Route::prefix('posts')->group(function (){
+
     Route::get('/create','PostController@create');
     Route::post('/','PostController@store');
+    Route::get('/{post}','PostController@show');
+
 });
 
-Route::get('/profiles/{user}', 'ProfileController@show')->name('profile.show');
+Route::prefix('profiles')->group(function () {
+
+    Route::get('/{user}', 'ProfileController@show');
+    Route::get('/{user}/edit', 'ProfileController@edit');
+    Route::put('/{user}', 'ProfileController@update');
+});

@@ -25,7 +25,7 @@
                                name="image" autocomplete="caption" autofocus>
 
                         @error('image')
-                               <strong>{{ $message }}</strong>
+                        <strong>{{ $message }}</strong>
                         @enderror
                     </div>
                     <div class="row pt-4">

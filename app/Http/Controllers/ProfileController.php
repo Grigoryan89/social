@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\User;
 use Illuminate\Http\Request;
+use Intervention\Image\Facades\Image;
 
 class ProfileController extends Controller
 {
@@ -49,10 +50,8 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(User $user)
     {
-        $user = User::findOrFail($id);
-
         return view('profiles.show',compact('user'));
     }
 
@@ -62,9 +61,11 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(User $user)
     {
-        //
+        $this->authorize('update',$user->profile);
+
+        return view('profiles.edit',compact('user'));
     }
 
     /**
@@ -74,9 +75,32 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, User $user)
     {
-        //
+
+        $this->authorize('update',$user->profile);
+
+        $data = $request->validate([
+            'title' => 'required',
+            'description' => 'required',
+            'url' => 'url',
+            'image' => '',
+        ]);
+
+        if ($request->image){
+            $imagePath = $request->image->store('profiles','public');
+
+            $image = Image::make(public_path("/storage/{$imagePath}"))->fit(1200,1200);
+            $image->save();
+
+            $imageArray = ['image'=>$imagePath] ;
+        }
+
+        auth()->user()->profile->update(array_merge(
+            $data,
+            $imageArray ?? []
+        ));
+        return redirect("/profiles/{$user->id}");
     }
 
     /**
@@ -85,7 +109,7 @@ class ProfileController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(User $user)
     {
         //
     }
