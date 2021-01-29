@@ -52,7 +52,9 @@ class ProfileController extends Controller
      */
     public function show(User $user)
     {
-        return view('profiles.show',compact('user'));
+        $follows = (auth()->user()) ? auth()->user()->following->contains($user->id) : false;
+
+        return view('profiles.show',compact('user','follows'));
     }
 
     /**
